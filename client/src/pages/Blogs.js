@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import BlogCard from "../components/BlogCard"; // Updated BlogCard supports media & mediaType
 
@@ -57,9 +58,9 @@ const Blogs = () => {
                         <h2 style={{ fontSize: "2rem", fontWeight: 700, color: "#333", margin: 0 }}>Featured Articles</h2>
                         <p style={{ color: "#666", marginTop: "5px", fontSize: "1rem" }}>Hand-picked stories worth your time</p>
                     </div>
-                    <a href="#" style={{ textDecoration: "none", color: "#333", fontWeight: "bold", display: "flex", alignItems: "center" }}>
+                    <Link to="/blogs" style={{ textDecoration: "none", color: "#333", fontWeight: "bold", display: "flex", alignItems: "center" }} aria-label="View all blogs">
                         View all <span style={{ marginLeft: "5px" }}>→</span>
-                    </a>
+                    </Link>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "30px", paddingTop: "20px" }}>
