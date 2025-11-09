@@ -4,12 +4,19 @@ client/node_modules/
 
 # Environment files
 .env
+.env.*
 
 # Build outputs
-/build
-/dist
+build/
+client/build/
+dist/
+
+# Local uploads
+uploads/
 
 # Misc
 .DS_Store
 npm-debug.log
 yarn-error.log
+Thumbs.db
+.vscode/

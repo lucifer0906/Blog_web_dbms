@@ -23,6 +23,7 @@ export default function BlogCard({
     time,
     id,
     isUser,
+    coverImage,
 }) {
     const navigate = useNavigate();
 
@@ -54,7 +55,7 @@ export default function BlogCard({
     // ✅ Unified media rendering with click-to-navigate behavior
     const displayMedia = () => {
         // Use media field first, fallback to image for older blogs
-        const mediaUrl = media || image || "";
+    const mediaUrl = coverImage || media || image || "";
         if (!mediaUrl) return null;
 
         // YouTube video

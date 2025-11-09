@@ -31,11 +31,11 @@ exports.getAllBlogsController = async (req, res) => {
 // ✅ CREATE BLOG
 exports.createBlogController = async (req, res) => {
     try {
-        const { title, description, media, mediaType, user } = req.body;
-        if (!title || !description || !media || !user) {
+        const { title, description, media, mediaType, user, coverImage } = req.body;
+        if (!title || !description || !user || (!media && !coverImage)) {
             return res.status(400).send({
                 success: false,
-                message: "Please provide all fields",
+                message: "Provide title, description, user and either media URL or cover image",
             });
         }
 
@@ -52,6 +52,7 @@ exports.createBlogController = async (req, res) => {
             description,
             media,
             mediaType,
+            coverImage, // optional
             user,
         });
 
@@ -81,13 +82,16 @@ exports.createBlogController = async (req, res) => {
 exports.updateBlogController = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, media, mediaType } = req.body;
+    const { title, description, media, mediaType, coverImage } = req.body;
 
-        const blog = await blogModel.findByIdAndUpdate(
-            id,
-            { title, description, media, mediaType }, // ✅ Corrected field names
-            { new: true }
-        );
+        // Prevent clearing both media and coverImage
+        if (!media && !coverImage) {
+            return res.status(400).send({
+                success: false,
+                message: "At least one of media or coverImage must be provided",
+            });
+        }
+        const blog = await blogModel.findByIdAndUpdate(id, { title, description, media, mediaType, coverImage }, { new: true });
 
         if (!blog) {
             return res.status(404).send({
@@ -190,5 +194,20 @@ exports.userBlogController = async (req, res) => {
             message: "Error in user blog controller",
             error,
         });
+    }
+};
+
+// ✅ IMAGE UPLOAD CONTROLLER
+exports.uploadImageController = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).send({ success: false, message: "No file uploaded" });
+        }
+        // Build public URL based on static mount
+        const url = `/uploads/${req.file.filename}`;
+        return res.status(200).send({ success: true, message: "Image uploaded", url });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({ success: false, message: "Error while uploading image", error });
     }
 };

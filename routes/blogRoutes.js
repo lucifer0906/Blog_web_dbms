@@ -6,7 +6,9 @@ const {
     getBlogByIdController,
     deleteBlogController,
     userBlogController,
+    uploadImageController,
 } = require("../controllers/blogController");
+const upload = require("../middlewares/upload");
 
 //router object
 const router = express.Router();
@@ -29,5 +31,8 @@ router.delete("/delete-blog/:id", deleteBlogController);
 
 //GET || user blog
 router.get("/user-blog/:id", userBlogController);
+
+//POST || upload image (cover or inline)
+router.post("/upload-image", upload.single("image"), uploadImageController);
 
 module.exports = router;

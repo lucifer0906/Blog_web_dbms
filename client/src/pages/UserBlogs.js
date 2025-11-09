@@ -58,8 +58,9 @@ const UserBlogs = () => {
                             isUser={true}
                             title={blog.title}
                             description={blog.description}
-                            media={blog.media || blog.image}       // ✅ unified media
-                            mediaType={blog.mediaType || "image"}  // ✅ fallback mediaType
+                            media={blog.media || blog.image}
+                            mediaType={blog.mediaType || "image"}
+                            coverImage={blog.coverImage}
                             username={blog.user.username}
                             time={blog.createdAt}
                         />

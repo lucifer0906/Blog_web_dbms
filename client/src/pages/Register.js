@@ -31,10 +31,12 @@ const Register = () => {
             if (data.success) {
                 toast.success("User Registered Successfully");
                 navigate("/login");
+            } else {
+                toast.error(data?.message || "Registration failed");
             }
         } catch (error) {
-            console.log(error);
-            toast.error("Registration failed");
+            const msg = error?.response?.data?.message || "Registration failed";
+            toast.error(msg);
         }
     };
 

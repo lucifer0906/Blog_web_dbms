@@ -71,8 +71,9 @@ const Blogs = () => {
                                 isUser={localStorage.getItem("userId") === blog?.user?._id}
                                 title={blog.title}
                                 description={blog.description}
-                                media={blog.media || blog.image}       // ✅ unified media for BlogCard
-                                mediaType={blog.mediaType || "image"}  // ✅ fallback mediaType
+                                media={blog.media || blog.image}
+                                mediaType={blog.mediaType || "image"}
+                                coverImage={blog.coverImage}
                                 username={blog?.user?.username}
                                 time={blog.createdAt}
                             />

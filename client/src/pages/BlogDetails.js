@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 
 const BlogDetails = () => {
     const [blog, setBlog] = useState(null);
@@ -23,7 +24,7 @@ const BlogDetails = () => {
 
     if (!blog) return <p style={{ textAlign: "center" }}>Loading...</p>;
 
-    const { title, description, media, mediaType, user, createdAt } = blog;
+    const { title, description, media, mediaType, user, createdAt, coverImage } = blog;
 
     // 🎥 Detect YouTube
     let videoEmbedUrl = "";
@@ -47,6 +48,21 @@ const BlogDetails = () => {
             }}
         >
             {/* 🖼️ Media Section */}
+            {/* Cover Image if available */}
+            {coverImage && !videoEmbedUrl && (
+                <img
+                    src={coverImage}
+                    alt={title}
+                    style={{
+                        width: "100%",
+                        borderRadius: "12px",
+                        marginBottom: "25px",
+                        objectFit: "cover",
+                        maxHeight: 480,
+                    }}
+                />
+            )}
+
             {videoEmbedUrl ? (
                 <div style={{ textAlign: "center", marginBottom: "25px" }}>
                     <iframe
@@ -127,17 +143,17 @@ const BlogDetails = () => {
             </div>
 
             {/* 📖 Description */}
-            <p
+            <div
                 style={{
                     marginTop: "10px",
-                    fontSize: "1.1rem",
+                    fontSize: "1.05rem",
                     lineHeight: 1.8,
-                    color: "#444",
+                    color: "#333",
                     textAlign: "left",
                 }}
             >
-                {description}
-            </p>
+                <ReactMarkdown>{description || ""}</ReactMarkdown>
+            </div>
 
             {/* ✅ Go to Blogs Button */}
             <div style={{ textAlign: "center", marginTop: "40px" }}>

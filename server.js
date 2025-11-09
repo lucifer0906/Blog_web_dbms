@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const colors = require("colors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
+const path = require("path");
 
 // ENV config
 dotenv.config();
@@ -18,6 +19,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
+
+// Static file serving for uploaded images
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Import routes
 const userRoutes = require("./routes/userRoutes");

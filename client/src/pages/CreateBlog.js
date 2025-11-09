@@ -35,7 +35,9 @@ const CreateBlog = () => {
         description: "",
         media: "",
         mediaType: "image",
+        coverImage: "",
     });
+    const [uploading, setUploading] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -45,9 +47,57 @@ const CreateBlog = () => {
                 description: editingBlog.description || "",
                 media: editingBlog.media || editingBlog.image || "",
                 mediaType: editingBlog.mediaType || "image",
+                coverImage: editingBlog.coverImage || "",
             });
         }
     }, [editingBlog]);
+    const handleCoverUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append("image", file);
+            const { data } = await axios.post("/api/v1/blog/upload-image", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            if (data.success) {
+                setInputs((prev) => ({ ...prev, coverImage: data.url }));
+                toast.success("Cover image uploaded");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Cover upload failed");
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleInlineImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append("image", file);
+            const { data } = await axios.post("/api/v1/blog/upload-image", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            if (data.success) {
+                // Insert markdown image tag into description
+                setInputs((prev) => ({
+                    ...prev,
+                    description: prev.description + `\n![](${data.url})\n`,
+                }));
+                toast.success("Inline image uploaded");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Inline image upload failed");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleChange = (e) => {
         setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -57,6 +107,11 @@ const CreateBlog = () => {
         e.preventDefault();
         setLoading(true);
         try {
+            if (!inputs.media && !inputs.coverImage) {
+                toast.error("Provide a media URL or upload a cover image");
+                setLoading(false);
+                return;
+            }
             if (editingBlog?.id) {
                 // Edit mode → Update blog
                 const { data } = await axios.put(`/api/v1/blog/update-blog/${editingBlog.id}`, {
@@ -64,6 +119,7 @@ const CreateBlog = () => {
                     description: inputs.description,
                     media: inputs.media,
                     mediaType: inputs.mediaType,
+                    coverImage: inputs.coverImage,
                 });
                 if (data?.success) {
                     toast.success("Blog updated successfully!");
@@ -76,6 +132,7 @@ const CreateBlog = () => {
                     description: inputs.description,
                     media: inputs.media,
                     mediaType: inputs.mediaType,
+                    coverImage: inputs.coverImage,
                     user: userId,
                 });
                 if (data?.success) {
@@ -104,7 +161,25 @@ const CreateBlog = () => {
 
                     <form onSubmit={handleSubmit}>
                         <StyledTextField name="title" label="Blog Title" value={inputs.title} onChange={handleChange} fullWidth margin="normal" required />
-                        <StyledTextField name="description" label="Content / Description" value={inputs.description} onChange={handleChange} fullWidth margin="normal" multiline rows={6} required />
+                        <StyledTextField name="description" label="Content / Description (Markdown supported for inline images)" value={inputs.description} onChange={handleChange} fullWidth margin="normal" multiline rows={8} required />
+                        <Box display="flex" gap={2} mt={1}>
+                            <Button variant="outlined" component="label" disabled={uploading} sx={{ borderRadius: 2 }}>
+                                {uploading ? "Uploading..." : "Upload Inline Image"}
+                                <input type="file" accept="image/*" hidden onChange={handleInlineImageUpload} />
+                            </Button>
+                        </Box>
+                        <Box mt={3}>
+                            <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                                Cover Image (optional)
+                            </Typography>
+                            {inputs.coverImage && (
+                                <img src={inputs.coverImage} alt="cover" style={{ width: "100%", maxHeight: 240, objectFit: "cover", borderRadius: 12, marginBottom: 10 }} />
+                            )}
+                            <Button variant="contained" component="label" color="secondary" disabled={uploading} sx={{ borderRadius: 2 }}>
+                                {uploading ? "Uploading..." : inputs.coverImage ? "Change Cover" : "Upload Cover"}
+                                <input type="file" accept="image/*" hidden onChange={handleCoverUpload} />
+                            </Button>
+                        </Box>
                         <StyledTextField select name="mediaType" label="Select Media Type" value={inputs.mediaType} onChange={handleChange} fullWidth margin="normal" required>
                             <MenuItem value="image">Image</MenuItem>
                             <MenuItem value="video">Video</MenuItem>
@@ -117,7 +192,7 @@ const CreateBlog = () => {
                             onChange={handleChange}
                             fullWidth
                             margin="normal"
-                            required
+                            required={!inputs.coverImage}
                         />
 
                         <Button type="submit" fullWidth variant="contained" color="primary" disabled={loading} sx={{ marginTop: 4, paddingY: 1.5, fontWeight: "bold", fontSize: "18px", borderRadius: 12 }}>

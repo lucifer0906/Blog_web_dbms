@@ -34,10 +34,12 @@ const Login = () => {
                 dispatch(authActions.login());
                 toast.success("Login Successfully");
                 navigate("/");
+            } else {
+                toast.error(data?.message || "Login failed");
             }
         } catch (error) {
-            console.log(error);
-            toast.error("Login failed");
+            const msg = error?.response?.data?.message || "Login failed";
+            toast.error(msg);
         }
     };
 
