@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const blogModel = require("../models/blogModel");
 const userModel = require("../models/userModel");
+const cloudinary = require("../utils/cloudinary");
 
 // ✅ GET ALL BLOGS
 exports.getAllBlogsController = async (req, res) => {
@@ -197,17 +198,25 @@ exports.userBlogController = async (req, res) => {
     }
 };
 
-// ✅ IMAGE UPLOAD CONTROLLER
+// ✅ IMAGE UPLOAD CONTROLLER (Cloudinary)
 exports.uploadImageController = async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).send({ success: false, message: "No file uploaded" });
         }
-        // Build public URL based on static mount
-        const url = `/uploads/${req.file.filename}`;
-        return res.status(200).send({ success: true, message: "Image uploaded", url });
+
+        // Convert buffer to Data URI for Cloudinary upload
+        const b64 = Buffer.from(req.file.buffer).toString("base64");
+        const dataUri = `data:${req.file.mimetype};base64,${b64}`;
+
+        const result = await cloudinary.uploader.upload(dataUri, {
+            folder: "blog-app",
+            resource_type: "image",
+        });
+
+        return res.status(200).send({ success: true, message: "Image uploaded", url: result.secure_url });
     } catch (error) {
         console.log(error);
-        return res.status(500).send({ success: false, message: "Error while uploading image", error });
+        return res.status(500).send({ success: false, message: "Error while uploading image", error: error?.message || error });
     }
 };

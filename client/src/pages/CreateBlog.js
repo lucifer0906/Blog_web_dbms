@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
@@ -58,7 +58,7 @@ const CreateBlog = () => {
         try {
             const formData = new FormData();
             formData.append("image", file);
-            const { data } = await axios.post("/api/v1/blog/upload-image", formData, {
+            const { data } = await api.post("/api/v1/blog/upload-image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             if (data.success) {
@@ -80,7 +80,7 @@ const CreateBlog = () => {
         try {
             const formData = new FormData();
             formData.append("image", file);
-            const { data } = await axios.post("/api/v1/blog/upload-image", formData, {
+            const { data } = await api.post("/api/v1/blog/upload-image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             if (data.success) {
@@ -114,7 +114,7 @@ const CreateBlog = () => {
             }
             if (editingBlog?.id) {
                 // Edit mode → Update blog
-                const { data } = await axios.put(`/api/v1/blog/update-blog/${editingBlog.id}`, {
+                const { data } = await api.put(`/api/v1/blog/update-blog/${editingBlog.id}`, {
                     title: inputs.title,
                     description: inputs.description,
                     media: inputs.media,
@@ -127,7 +127,7 @@ const CreateBlog = () => {
                 }
             } else {
                 // Create mode → New blog
-                const { data } = await axios.post("/api/v1/blog/create-blog", {
+                const { data } = await api.post("/api/v1/blog/create-blog", {
                     title: inputs.title,
                     description: inputs.description,
                     media: inputs.media,

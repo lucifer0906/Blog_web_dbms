@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import BlogCard from "../components/BlogCard"; // Updated BlogCard supports media & mediaType
 
 const Blogs = () => {
@@ -10,7 +10,7 @@ const Blogs = () => {
     // Fetch all blogs
     const getAllBlogs = async () => {
         try {
-            const { data } = await axios.get("/api/v1/blog/all-blog");
+            const { data } = await api.get("/api/v1/blog/all-blog");
             if (data?.success) {
                 setBlogs(data?.blogs);
             }

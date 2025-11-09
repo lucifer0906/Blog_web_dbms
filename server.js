@@ -16,12 +16,16 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: [
+        process.env.CLIENT_ORIGIN || "*"
+    ],
+    credentials: true,
+}));
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Static file serving for uploaded images
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Removed local /uploads static since images go to Cloudinary now.
 
 // Import routes
 const userRoutes = require("./routes/userRoutes");
